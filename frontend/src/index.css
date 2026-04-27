@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", "Noto Sans Devanagari", sans-serif;
+  color: #172033;
+  background: #fffaf3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(181, 33, 48, 0.1), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(247, 148, 30, 0.12), transparent 28%),
+    linear-gradient(135deg, #fff9ef 0%, #fffefb 48%, #f3eadb 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(181, 33, 48, 0.25);
+  outline-offset: 2px;
+}

@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+.DS_Store
+artifacts
+cache
+coverage
+frontend/dist
+backend/dist
+contracts/artifacts
+contracts/cache
+contracts/ignition/deployments

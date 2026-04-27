@@ -1,0 +1,22 @@
+{
+  "name": "state-government-fund-tracking-system",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Blockchain-based transparency platform for tracking state government fund flows.",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "contracts"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
+    "build": "npm run build --workspace frontend && npm run build --workspace backend && npm run compile --workspace contracts",
+    "lint": "npm run lint --workspace frontend",
+    "seed": "npm run seed --workspace backend",
+    "compile:contracts": "npm run compile --workspace contracts",
+    "deploy:local": "npm run deploy:local --workspace contracts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "contracts",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "compile:contracts": "npm run compile",
+    "compile": "mkdir -p ../.codex-home && HOME=../.codex-home hardhat compile",
+    "deploy:local": "mkdir -p ../.codex-home && HOME=../.codex-home hardhat run scripts/deploy.js --network localhost"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "2.2.3",
+    "dotenv": "17.4.2",
+    "hardhat": "2.22.19"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.6.1",
+    "ethers": "5.8.0"
+  }
+}
