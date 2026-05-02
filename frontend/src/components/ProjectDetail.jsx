@@ -9,6 +9,8 @@ import { api, BACKEND_BASE_URL } from "../lib/api";
 /** Fix file URLs that may have been saved with wrong base (e.g. localhost when on prod) */
 function fixFileUrl(url) {
   if (!url) return url;
+  // Cloudinary URLs should be returned as-is
+  if (url.includes("res.cloudinary.com") || url.includes("cloudinary.com")) return url;
   // If url already uses the correct backend, return as-is
   if (url.startsWith(BACKEND_BASE_URL)) return url;
   // Replace whatever origin/base is in the stored URL with the correct one

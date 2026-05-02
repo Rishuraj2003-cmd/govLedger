@@ -6,6 +6,22 @@ import { Footer } from "../components/Footer";
 import { ProjectDetail } from "../components/ProjectDetail";
 import { t } from "../lib/i18n";
 import { shortAddress } from "../lib/wallet";
+import { BACKEND_BASE_URL } from "../lib/api";
+
+function fixFileUrl(url) {
+  if (!url) return url;
+  // Cloudinary URLs should be returned as-is
+  if (url.includes("res.cloudinary.com") || url.includes("cloudinary.com")) return url;
+  // If url already uses the correct backend, return as-is
+  if (url.startsWith(BACKEND_BASE_URL)) return url;
+  // Replace whatever origin/base is in the stored URL with the correct one
+  try {
+    const parsed = new URL(url);
+    return BACKEND_BASE_URL + parsed.pathname;
+  } catch {
+    return url;
+  }
+}
 
 function SectionCard({ title, subtitle, children, right, className = "" }) {
   return (
@@ -640,7 +656,7 @@ export function DashboardPage({
                       {sub.proofFiles?.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {sub.proofFiles.map((f, i) => (
-                            <a key={i} href={f.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-lg bg-blue-50 text-blue-600 px-3 py-1.5 text-xs font-semibold hover:bg-blue-100 transition-colors">
+                            <a key={i} href={fixFileUrl(f.url)} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-lg bg-blue-50 text-blue-600 px-3 py-1.5 text-xs font-semibold hover:bg-blue-100 transition-colors">
                               <FileText size={12} /> Proof {i + 1}
                             </a>
                           ))}
@@ -648,13 +664,13 @@ export function DashboardPage({
                       )}
                       <div className="flex gap-2 mt-auto pt-2">
                         <button
-                          onClick={() => onApproveWork(sub._id, sub.vendor?.walletAddress || "")}
+                          onClick={() => onApproveWork(sub._id, { receiverWallet: sub.vendor?.walletAddress || "" })}
                           className="flex-1 rounded-xl bg-emerald-600 text-white text-sm font-bold py-2.5 hover:bg-emerald-700 transition-colors"
                         >
                           ✓ Approve & Pay
                         </button>
                         <button
-                          onClick={() => onRejectWork(sub._id, "Rejected by authority")}
+                          onClick={() => onRejectWork(sub._id, { reason: "Rejected by authority" })}
                           className="flex-1 rounded-xl border border-rose-200 text-rose-600 text-sm font-bold py-2.5 hover:bg-rose-50 transition-colors"
                         >
                           ✗ Reject
