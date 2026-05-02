@@ -4,7 +4,21 @@ import {
   Hash, Coins, TrendingUp, Clock, CheckCircle2, AlertCircle,
   ExternalLink, ArrowRight, UploadCloud, FileText, Image as ImageIcon
 } from "lucide-react";
-import { api } from "../lib/api";
+import { api, BACKEND_BASE_URL } from "../lib/api";
+
+/** Fix file URLs that may have been saved with wrong base (e.g. localhost when on prod) */
+function fixFileUrl(url) {
+  if (!url) return url;
+  // If url already uses the correct backend, return as-is
+  if (url.startsWith(BACKEND_BASE_URL)) return url;
+  // Replace whatever origin/base is in the stored URL with the correct one
+  try {
+    const parsed = new URL(url);
+    return BACKEND_BASE_URL + parsed.pathname;
+  } catch {
+    return url;
+  }
+}
 
 const ROLE_COLOR = {
   ADMIN: "bg-purple-100 text-purple-800",
@@ -388,7 +402,7 @@ export function ProjectDetail({ projectId, user, onBack, onGetProject, onSubmitW
               {sub.proofFiles?.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {sub.proofFiles.map((file, i) => (
-                    <a key={i} href={file.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-xs text-blue-600 hover:bg-slate-200">
+                    <a key={i} href={fixFileUrl(file.url)} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-xs text-blue-600 hover:bg-slate-200">
                       {file.mimetype.includes("image") ? <ImageIcon size={12} /> : <FileText size={12} />}
                       Proof {i+1}
                     </a>

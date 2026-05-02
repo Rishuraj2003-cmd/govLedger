@@ -1,6 +1,7 @@
 import { getStoredToken, setStoredToken } from "./storage";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+export const BACKEND_BASE_URL = API_URL.replace(/\/api$/, "");
 
 async function request(path, options = {}) {
   const token = getStoredToken();
