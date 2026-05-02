@@ -640,13 +640,13 @@ export function DashboardPage({
                 )}
 
                 {user.role === "DISTRICT" && (
-                  <SectionCard title="Add Vendor Entity" subtitle="Register a vendor wallet for payments">
+                  <SectionCard title="Add Vendor Entity" subtitle="Register a vendor wallet and login credentials for payments">
                     <form className="grid gap-5" onSubmit={async (e) => {
                       e.preventDefault();
                       try {
-                        await onCreateUser({ ...userForm, role: "VENDOR", departmentName: "N/A", password: "vendor_placeholder_password", email: `vendor_${Date.now()}@example.com` });
-                        setUserForm(c => ({ ...c, firstName: "", lastName: "", walletAddress: "" }));
-                        alert("Vendor created successfully!");
+                        await onCreateUser({ ...userForm, role: "VENDOR", departmentName: "N/A" });
+                        setUserForm(c => ({ ...c, firstName: "", lastName: "", walletAddress: "", email: "", password: "" }));
+                        alert("Vendor created successfully! The vendor can now login.");
                       } catch (err) {
                         alert(err.message);
                       }
@@ -654,6 +654,10 @@ export function DashboardPage({
                       <div className="grid grid-cols-2 gap-5">
                         <FormInput label="Vendor Agency Name" required value={userForm.firstName} onChange={e => setUserForm(c => ({ ...c, firstName: e.target.value, lastName: "Agency" }))} />
                         <FormInput label="Wallet Address" required value={userForm.walletAddress} onChange={e => setUserForm(c => ({ ...c, walletAddress: e.target.value }))} placeholder="0x..." />
+                      </div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <FormInput label="Vendor Email (For Login)" required type="email" value={userForm.email || ""} onChange={e => setUserForm(c => ({ ...c, email: e.target.value }))} placeholder="vendor@example.com" />
+                        <FormInput label="Set Login Password" required type="password" value={userForm.password || ""} onChange={e => setUserForm(c => ({ ...c, password: e.target.value }))} placeholder="Minimum 6 characters" />
                       </div>
                       <div className="flex justify-end mt-4">
                         <button type="submit" className="px-6 py-2.5 rounded-xl font-bold text-sm bg-[#3B82F6] text-white shadow-md hover:bg-blue-700 transition-colors">Add Vendor</button>
