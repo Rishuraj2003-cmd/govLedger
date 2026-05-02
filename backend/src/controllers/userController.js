@@ -15,10 +15,7 @@ function validationFailed(request, response) {
 
 export async function listUsers(request, response) {
   let query = {};
-  if (request.user.role === "DISTRICT") {
-    query.district = request.user.district;
-  } else if (request.user.role === "DEPARTMENT") {
-    query.departmentName = request.user.departmentName;
+  if (request.user.role === "DISTRICT" || request.user.role === "DEPARTMENT") {
     query.district = request.user.district;
   }
 
