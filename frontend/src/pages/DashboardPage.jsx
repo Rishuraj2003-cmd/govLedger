@@ -344,10 +344,15 @@ export function DashboardPage({
       { key: "transactions", label: t(language, "transactions"), icon: ArrowLeftRight },
       { key: "announcements", label: t(language, "announcements"), icon: BellPlus },
     ];
-    if (["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role)) {
+    // Approvals: only DEPARTMENT verifies vendor work (per flowchart)
+    if (user.role === "DEPARTMENT") {
       base.push({ key: "approvals", label: "Approvals", icon: ClipboardCheck });
+    }
+    // Fund Management: all authority roles
+    if (["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role)) {
       base.push({ key: "fund-management", label: "Fund Management", icon: Shield });
     }
+    // People: Admin and District can create users
     if (user.role === "ADMIN" || user.role === "DISTRICT") {
       base.push({ key: "people", label: t(language, "people"), icon: Users });
     }
@@ -602,7 +607,7 @@ export function DashboardPage({
             </div>
           ) : null}
 
-          {tab === "approvals" && ["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role) ? (
+          {tab === "approvals" && user.role === "DEPARTMENT" ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Pending Approvals</h2>
               {(!pendingSubmissions || pendingSubmissions.length === 0) ? (

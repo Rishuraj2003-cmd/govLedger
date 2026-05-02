@@ -101,7 +101,7 @@ router.get(
 );
 router.post(
   "/submissions/:subId/approve",
-  requireRoles("ADMIN", "DISTRICT", "DEPARTMENT"),
+  requireRoles("DEPARTMENT"),
   approveSubmission,
 );
 router.post(
