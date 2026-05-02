@@ -348,7 +348,7 @@ export function DashboardPage({
       base.push({ key: "approvals", label: "Approvals", icon: ClipboardCheck });
       base.push({ key: "fund-management", label: "Fund Management", icon: Shield });
     }
-    if (user.role === "ADMIN") {
+    if (user.role === "ADMIN" || user.role === "DISTRICT") {
       base.push({ key: "people", label: t(language, "people"), icon: Users });
     }
     return base;
@@ -639,32 +639,7 @@ export function DashboardPage({
                   </SectionCard>
                 )}
 
-                {user.role === "DISTRICT" && (
-                  <SectionCard title="Add Vendor Entity" subtitle="Register a vendor wallet and login credentials for payments">
-                    <form className="grid gap-5" onSubmit={async (e) => {
-                      e.preventDefault();
-                      try {
-                        await onCreateUser({ ...userForm, role: "VENDOR", departmentName: "N/A" });
-                        setUserForm(c => ({ ...c, firstName: "", lastName: "", walletAddress: "", email: "", password: "" }));
-                        alert("Vendor created successfully! The vendor can now login.");
-                      } catch (err) {
-                        alert(err.message);
-                      }
-                    }}>
-                      <div className="grid grid-cols-2 gap-5">
-                        <FormInput label="Vendor Agency Name" required value={userForm.firstName} onChange={e => setUserForm(c => ({ ...c, firstName: e.target.value, lastName: "Agency" }))} />
-                        <FormInput label="Wallet Address" required value={userForm.walletAddress} onChange={e => setUserForm(c => ({ ...c, walletAddress: e.target.value }))} placeholder="0x..." />
-                      </div>
-                      <div className="grid grid-cols-2 gap-5">
-                        <FormInput label="Vendor Email (For Login)" required type="email" value={userForm.email || ""} onChange={e => setUserForm(c => ({ ...c, email: e.target.value }))} placeholder="vendor@example.com" />
-                        <FormInput label="Set Login Password" required type="password" value={userForm.password || ""} onChange={e => setUserForm(c => ({ ...c, password: e.target.value }))} placeholder="Minimum 6 characters" />
-                      </div>
-                      <div className="flex justify-end mt-4">
-                        <button type="submit" className="px-6 py-2.5 rounded-xl font-bold text-sm bg-[#3B82F6] text-white shadow-md hover:bg-blue-700 transition-colors">Add Vendor</button>
-                      </div>
-                    </form>
-                  </SectionCard>
-                )}
+
 
                 {user.role === "ADMIN" && (
                   <SectionCard title={t(language, "allocateFunds")} subtitle="Release budget from State to Department">
@@ -768,7 +743,7 @@ export function DashboardPage({
             </div>
           ) : null}
 
-          {tab === "people" && user.role === "ADMIN" ? (
+          {tab === "people" && (user.role === "ADMIN" || user.role === "DISTRICT") ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">{t(language, "people")}</h2>
               <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
@@ -787,7 +762,7 @@ export function DashboardPage({
                       await onCreateUser(userForm);
                       setUserCreated(true);
                       setTimeout(() => setUserCreated(false), 5000);
-                      setUserForm({ firstName: "", lastName: "", email: "", departmentName: "", district: "", state: "Bihar", role: "DEPARTMENT", password: "" });
+                      setUserForm({ firstName: "", lastName: "", email: "", departmentName: "", district: "", state: "Bihar", role: user.role === "ADMIN" ? "DISTRICT" : "DEPARTMENT", password: "", walletAddress: "" });
                     } catch (err) { }
                   }}>
                     <FormInput label={t(language, "firstName")} value={userForm.firstName} onChange={e => setUserForm(c => ({ ...c, firstName: e.target.value }))} required />
@@ -795,8 +770,9 @@ export function DashboardPage({
                     <FormInput label={t(language, "email")} type="email" value={userForm.email} onChange={e => setUserForm(c => ({ ...c, email: e.target.value }))} required />
 
                     <FormSelect label={t(language, "role")} value={userForm.role} onChange={e => setUserForm(c => ({ ...c, role: e.target.value, departmentName: "", district: "" }))}>
-                      <option value="DEPARTMENT">Department Admin</option>
-                      <option value="DISTRICT">District Admin</option>
+                      {user.role === "ADMIN" && <option value="DISTRICT">District Admin</option>}
+                      {(user.role === "ADMIN" || user.role === "DISTRICT") && <option value="DEPARTMENT">Department Admin</option>}
+                      {user.role === "DISTRICT" && <option value="VENDOR">Vendor / Contractor</option>}
                     </FormSelect>
 
                     {(userForm.role === "DEPARTMENT" || userForm.role === "DISTRICT") && (
@@ -808,6 +784,10 @@ export function DashboardPage({
                         <option value="">Select district</option>
                         {referenceData.districts.map(i => <option key={i} value={i}>{i}</option>)}
                       </FormSelect>
+                    )}
+
+                    {userForm.role === "VENDOR" && (
+                      <FormInput label="Wallet Address" value={userForm.walletAddress || ""} onChange={e => setUserForm(c => ({ ...c, walletAddress: e.target.value }))} placeholder="0x..." required />
                     )}
 
                     <FormInput label={t(language, "password")} type="password" value={userForm.password} onChange={e => setUserForm(c => ({ ...c, password: e.target.value }))} required />
