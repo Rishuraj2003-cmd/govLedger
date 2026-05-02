@@ -133,9 +133,14 @@ function PrimaryButton({ children, type = "submit", onClick, disabled }) {
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-xl bg-[#0d4f6c] py-3 text-sm font-semibold text-white transition hover:bg-[#0a3f57] active:scale-[0.98] disabled:opacity-60"
+      className={`w-full rounded-xl bg-[#0d4f6c] py-3 text-sm font-semibold text-white transition hover:bg-[#0a3f57] active:scale-[0.98] disabled:opacity-60 ${disabled ? "cursor-not-allowed" : ""}`}
     >
-      {children}
+      {disabled ? (
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          Processing...
+        </div>
+      ) : children}
     </button>
   );
 }
@@ -477,7 +482,7 @@ export function AuthPage({
                   Forgot Password?
                 </button>
               </div>
-              <PrimaryButton>Sign In</PrimaryButton>
+              <PrimaryButton disabled={isLoading}>Sign In</PrimaryButton>
               <Divider />
               {googleButton}
               <p className="text-center text-sm text-slate-500 mt-2">
@@ -514,7 +519,7 @@ export function AuthPage({
               </div>
               <PasswordField label="Password"         value={registerForm.password}        onChange={(e) => setRegisterForm((c) => ({ ...c, password: e.target.value }))} />
               <PasswordField label="Confirm Password" value={registerForm.confirmPassword} onChange={(e) => setRegisterForm((c) => ({ ...c, confirmPassword: e.target.value }))} />
-              <PrimaryButton>Create Account</PrimaryButton>
+              <PrimaryButton disabled={isLoading}>Create Account</PrimaryButton>
               <p className="text-center text-sm text-slate-500">
                 Already have an account?{" "}
                 <button type="button" onClick={() => { setView("login"); clearFeedback(); }} className="font-semibold text-[#0d4f6c] hover:underline">
@@ -535,7 +540,7 @@ export function AuthPage({
                 onChange={(e) => setOtpForm((c) => ({ ...c, otp: e.target.value }))}
                 placeholder="Enter OTP from email"
               />
-              <PrimaryButton>Verify & Activate Account</PrimaryButton>
+              <PrimaryButton disabled={isLoading}>Verify & Activate Account</PrimaryButton>
               <button
                 type="button"
                 onClick={() => onResendOtp({ email: otpForm.email }).then(() => setSuccess("OTP resent!")).catch((err) => setError(err.message))}
@@ -558,7 +563,7 @@ export function AuthPage({
               {forgotStep === "email" ? (
                 <form className="flex flex-col gap-4" onSubmit={submitForgotEmail}>
                   <Field label="Registered Email" icon={Mail} type="email" value={forgotForm.email} onChange={(e) => setForgotForm((c) => ({ ...c, email: e.target.value }))} placeholder="you@example.com" />
-                  <PrimaryButton>Send OTP to Email</PrimaryButton>
+                  <PrimaryButton disabled={isLoading}>Send OTP to Email</PrimaryButton>
                   <p className="text-center text-sm text-slate-500">
                     <button type="button" onClick={() => { setView("login"); clearFeedback(); }} className="font-semibold text-[#0d4f6c] hover:underline">
                       ← Back to Login
@@ -593,7 +598,7 @@ export function AuthPage({
                       {forgotForm.password === forgotForm.confirmPassword ? "Passwords match" : "Passwords do not match"}
                     </div>
                   ) : null}
-                  <PrimaryButton>Reset Password</PrimaryButton>
+                  <PrimaryButton disabled={isLoading}>Reset Password</PrimaryButton>
                   <button type="button" onClick={() => setForgotStep("email")} className="text-sm text-center text-[#0d4f6c] font-semibold hover:underline">
                     ← Change Email / Resend OTP
                   </button>
@@ -616,7 +621,7 @@ export function AuthPage({
               </SelectField>
               <PasswordField label="Password"         value={adminForm.password}        onChange={(e) => setAdminForm((c) => ({ ...c, password: e.target.value }))} />
               <PasswordField label="Confirm Password" value={adminForm.confirmPassword} onChange={(e) => setAdminForm((c) => ({ ...c, confirmPassword: e.target.value }))} />
-              <PrimaryButton>Setup Admin Account</PrimaryButton>
+              <PrimaryButton disabled={isLoading}>Setup Admin Account</PrimaryButton>
             </form>
           ) : null}
           {/* Footer / Terms */}

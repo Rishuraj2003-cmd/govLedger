@@ -41,6 +41,7 @@ export default function App() {
   const [showMetaMaskModal, setShowMetaMaskModal] = useState(false);
   const [needsProfileUser, setNeedsProfileUser] = useState(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   function setLanguage(nextLanguage) {
     setLanguageState(nextLanguage);
@@ -132,6 +133,7 @@ export default function App() {
   }, [user]);
 
   async function runAction(action) {
+    setIsLoading(true);
     try {
       const result = await action();
       setError("");
@@ -139,6 +141,8 @@ export default function App() {
     } catch (err) {
       setError(err.message);
       throw err;
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -306,6 +310,7 @@ export default function App() {
                 onConnectWallet={handleConnectWallet}
                 referenceData={referenceData}
                 authStatus={authStatus}
+                isLoading={isLoading}
                 walletAddress={walletAddress}
                 needsProfileUser={needsProfileUser}
               />
@@ -323,6 +328,7 @@ export default function App() {
                 overview={overview}
                 analytics={analytics}
                 users={users}
+                isLoading={isLoading}
                 pendingSubmissions={pendingSubmissions}
                 referenceData={referenceData}
                 walletAddress={user?.walletAddress || walletAddress || ""}

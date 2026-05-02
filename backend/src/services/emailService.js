@@ -39,11 +39,27 @@ export async function sendOtpEmail({ email, otp, purpose, name }) {
     return;
   }
 
-  await transporter.sendMail({
-    from: process.env.MAIL_FROM || "no-reply@biharfundtracker.local",
-    to: email,
-    subject: `Bihar Fund Tracker ${purpose} OTP`,
-    text: `Hello ${name}, your OTP for ${purpose} is ${otp}. It is valid for 10 minutes.`,
-    html: `<p>Hello ${name},</p><p>Your OTP for <strong>${purpose}</strong> is:</p><h2>${otp}</h2><p>It is valid for 10 minutes.</p>`,
-  });
+  try {
+    // Set a timeout for email sending to prevent hanging
+    const sendMailPromise = transporter.sendMail({
+      from: process.env.MAIL_FROM || "no-reply@biharfundtracker.local",
+      to: email,
+      subject: `Bihar Fund Tracker ${purpose} OTP`,
+      text: `Hello ${name}, your OTP for ${purpose} is ${otp}. It is valid for 10 minutes.`,
+      html: `<p>Hello ${name},</p><p>Your OTP for <strong>${purpose}</strong> is:</p><h2>${otp}</h2><p>It is valid for 10 minutes.</p>`,
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Email timeout")), 15000)
+    );
+
+    await Promise.race([sendMailPromise, timeoutPromise]);
+    console.log(`✅ OTP email sent to ${email}`);
+  } catch (error) {
+    console.error("❌ Failed to send OTP email:", error.message);
+    // In production, we still log it so admins can see the OTP if needed during debugging
+    console.log(`⚠️ FALLBACK OTP for ${email}: ${otp}`);
+    // We don't throw the error because we want the user to reach the OTP entry screen
+    // They can then ask for a resend if the email eventually arrives or we can help them.
+  }
 }
