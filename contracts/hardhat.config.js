@@ -11,6 +11,10 @@ const networks = {
 };
 
 if (process.env.RPC_URL) {
+  networks.sepolia = {
+    url: process.env.RPC_URL,
+    accounts: [PRIVATE_KEY],
+  };
   networks.amoy = {
     url: process.env.RPC_URL,
     accounts: [PRIVATE_KEY],
