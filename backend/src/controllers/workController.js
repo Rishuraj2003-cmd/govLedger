@@ -58,7 +58,8 @@ export async function getAllPendingSubmissions(request, response) {
     const projects = await Project.find({ district: request.user.district }).select("_id");
     query.project = { $in: projects.map((p) => p._id) };
   } else if (request.user.role === "DEPARTMENT") {
-    const projects = await Project.find({ district: request.user.district, department: request.user.departmentName }).select("_id");
+    // Show all pending submissions for projects in the same district
+    const projects = await Project.find({ district: request.user.district }).select("_id");
     query.project = { $in: projects.map((p) => p._id) };
   }
 

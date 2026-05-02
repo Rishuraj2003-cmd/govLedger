@@ -832,9 +832,9 @@ export function DashboardPage({
                     <FormInput label={t(language, "email")} type="email" value={userForm.email} onChange={e => setUserForm(c => ({ ...c, email: e.target.value }))} required />
 
                     <FormSelect label={t(language, "role")} value={userForm.role} onChange={e => setUserForm(c => ({ ...c, role: e.target.value, departmentName: "", district: "" }))}>
-                      {user.role === "ADMIN" && <option value="DISTRICT">District Admin</option>}
-                      {(user.role === "ADMIN" || user.role === "DISTRICT") && <option value="DEPARTMENT">Department Admin</option>}
-                      {user.role === "DISTRICT" && <option value="VENDOR">Vendor / Contractor</option>}
+                      {user.role === "ADMIN" && <option value="DISTRICT">District Officer (Jila Adhikari)</option>}
+                      {(user.role === "ADMIN" || user.role === "DISTRICT") && <option value="DEPARTMENT">Field Department (Executing Body)</option>}
+                      {user.role === "DISTRICT" && <option value="VENDOR">Vendor / Contractor (Thekedar)</option>}
                     </FormSelect>
 
                     {(userForm.role === "DEPARTMENT" || userForm.role === "DISTRICT") && (
