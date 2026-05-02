@@ -602,7 +602,64 @@ export function DashboardPage({
             </div>
           ) : null}
 
+          {tab === "approvals" && ["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role) ? (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Pending Approvals</h2>
+              {(!pendingSubmissions || pendingSubmissions.length === 0) ? (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
+                  <ClipboardCheck size={40} className="mx-auto text-slate-300 mb-3" />
+                  <p className="text-slate-500 font-medium">No pending submissions at this time.</p>
+                  <p className="text-sm text-slate-400 mt-1">All vendor work submissions will appear here for review.</p>
+                </div>
+              ) : (
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                  {pendingSubmissions.map((sub) => (
+                    <div key={sub._id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                      <div className="flex items-start justify-between">
+                        <span className="rounded-full px-3 py-1 text-xs font-bold bg-amber-100 text-amber-800">PENDING</span>
+                        <span className="text-xs font-semibold text-slate-400">{sub.completionPercent}% done</span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900">{sub.title}</h4>
+                        <p className="text-sm text-slate-500 mt-1 line-clamp-2">{sub.description}</p>
+                      </div>
+                      <div className="rounded-xl bg-slate-50 border border-slate-100 p-3 text-xs text-slate-600 space-y-1">
+                        <p><span className="font-semibold">Project:</span> {sub.project?.name || "—"}</p>
+                        <p><span className="font-semibold">Vendor:</span> {sub.vendor?.firstName} {sub.vendor?.lastName}</p>
+                        <p><span className="font-semibold">Requested Amount:</span> <span className="text-emerald-700 font-bold">₹{Number(sub.requestedAmount).toLocaleString("en-IN")}</span></p>
+                      </div>
+                      {sub.proofFiles?.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {sub.proofFiles.map((f, i) => (
+                            <a key={i} href={f.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-lg bg-blue-50 text-blue-600 px-3 py-1.5 text-xs font-semibold hover:bg-blue-100 transition-colors">
+                              <FileText size={12} /> Proof {i + 1}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex gap-2 mt-auto pt-2">
+                        <button
+                          onClick={() => onApproveWork(sub._id, sub.vendor?.walletAddress || "")}
+                          className="flex-1 rounded-xl bg-emerald-600 text-white text-sm font-bold py-2.5 hover:bg-emerald-700 transition-colors"
+                        >
+                          ✓ Approve & Pay
+                        </button>
+                        <button
+                          onClick={() => onRejectWork(sub._id, "Rejected by authority")}
+                          className="flex-1 rounded-xl border border-rose-200 text-rose-600 text-sm font-bold py-2.5 hover:bg-rose-50 transition-colors"
+                        >
+                          ✗ Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
+
           {tab === "fund-management" && ["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role) ? (
+
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Fund Management</h2>
 
