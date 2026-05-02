@@ -46,9 +46,9 @@ export async function createUserByAdmin(request, response) {
     if (!["OFFICER", "CONTRACTOR", "VENDOR"].includes(role)) {
       return response.status(403).json({ error: "Department Head can only create Officer, Contractor, or Vendor roles." });
     }
-    // Auto-fill so the vendor is linked to the creating department
-    request.body.district = request.user.district;
-    request.body.departmentName = request.user.departmentName;
+    if (request.body.district !== request.user.district || request.body.departmentName !== request.user.departmentName) {
+      return response.status(403).json({ error: "You can only create users for your own department and district." });
+    }
   }
 
   const existingUser = await User.findOne({ email: request.body.email.toLowerCase() });

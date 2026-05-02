@@ -352,8 +352,8 @@ export function DashboardPage({
     if (["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role)) {
       base.push({ key: "fund-management", label: "Fund Management", icon: Shield });
     }
-    // People: Finance Minister (ADMIN) creates District & Department, Department creates Vendor
-    if (user.role === "ADMIN" || user.role === "DEPARTMENT") {
+    // People: Admin and District can create users
+    if (user.role === "ADMIN" || user.role === "DISTRICT") {
       base.push({ key: "people", label: t(language, "people"), icon: Users });
     }
     return base;
@@ -805,7 +805,7 @@ export function DashboardPage({
             </div>
           ) : null}
 
-          {tab === "people" && (user.role === "ADMIN" || user.role === "DEPARTMENT") ? (
+          {tab === "people" && (user.role === "ADMIN" || user.role === "DISTRICT") ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">{t(language, "people")}</h2>
               <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
@@ -834,11 +834,16 @@ export function DashboardPage({
                     <FormSelect label={t(language, "role")} value={userForm.role} onChange={e => setUserForm(c => ({ ...c, role: e.target.value, departmentName: "", district: "" }))}>
                       {user.role === "ADMIN" && (
                         <>
-                          <option value="DISTRICT">District Account</option>
-                          <option value="DEPARTMENT">Department Account</option>
+                          <option value="DISTRICT">District Admin</option>
+                          <option value="DEPARTMENT">State Department Admin</option>
                         </>
                       )}
-                      {user.role === "DEPARTMENT" && <option value="VENDOR">Vendor / Contractor</option>}
+                      {user.role === "DISTRICT" && (
+                        <>
+                          <option value="DEPARTMENT">District Department Admin</option>
+                          <option value="VENDOR">Vendor / Contractor</option>
+                        </>
+                      )}
                     </FormSelect>
 
                     {(userForm.role === "DEPARTMENT" || userForm.role === "DISTRICT") && (
