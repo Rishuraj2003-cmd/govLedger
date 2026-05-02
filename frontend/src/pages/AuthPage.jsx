@@ -219,6 +219,7 @@ export function AuthPage({
   onConnectWallet,
   referenceData,
   authStatus,
+  isLoading,
   walletAddress,
   needsProfileUser,
 }) {

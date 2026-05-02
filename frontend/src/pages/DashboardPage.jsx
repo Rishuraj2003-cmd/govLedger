@@ -305,6 +305,7 @@ export function DashboardPage({
   overview,
   analytics,
   users,
+  isLoading,
   pendingSubmissions,
   referenceData,
   walletAddress,
