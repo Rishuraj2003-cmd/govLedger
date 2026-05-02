@@ -177,6 +177,7 @@ function ProfileSection({ user, language, referenceData, onUpdateProfile }) {
                 {(referenceData?.districts || []).map((d) => <option key={d} value={d}>{d}</option>)}
               </FormSelect>
             )}
+            <FormInput label="Wallet Address" value={form.walletAddress || ""} onChange={set("walletAddress")} placeholder="0x..." />
 
             <div className="col-span-full flex gap-3 mt-4">
               <button type="submit" disabled={saving} className="rounded-xl bg-[#0F172A] px-6 py-2.5 text-sm font-bold text-white shadow-md disabled:opacity-60">
@@ -323,6 +324,7 @@ export function DashboardPage({
     firstName: "", lastName: "", mobileNumber: "", email: "", departmentName: user.role === "DEPARTMENT" ? user.departmentName : "", district: (user.role === "DISTRICT" || user.role === "DEPARTMENT") ? user.district : "", state: "Bihar", role: user.role === "ADMIN" ? "DISTRICT" : user.role === "DISTRICT" ? "DEPARTMENT" : "OFFICER", password: "",
   });
   const [userCreated, setUserCreated] = useState(false);
+  const [projectCreated, setProjectCreated] = useState(false);
   const [userSearch, setUserSearch] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState("ALL");
   const transactions = overview.transactions || [];
@@ -671,7 +673,23 @@ export function DashboardPage({
               <div className="grid gap-8 xl:grid-cols-2 items-start">
                 {user.role === "DISTRICT" && (
                   <SectionCard title={t(language, "createProject")} subtitle="Setup a new district project">
-                    <form className="grid gap-5" onSubmit={(e) => { e.preventDefault(); onCreateProject(projectForm); }}>
+                    {projectCreated && (
+                      <div className="mb-4 rounded-xl bg-emerald-50 p-4 border border-emerald-100 flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <ClipboardCheck size={18} />
+                        </div>
+                        <p className="text-sm font-semibold text-emerald-800">Project successfully created!</p>
+                      </div>
+                    )}
+                    <form className="grid gap-5" onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await onCreateProject(projectForm);
+                        setProjectCreated(true);
+                        setTimeout(() => setProjectCreated(false), 5000);
+                        setProjectForm({ name: "", description: "", budget: "", department: "", district: "", timelineStart: "", timelineEnd: "" });
+                      } catch (err) {}
+                    }}>
                       <div className="grid grid-cols-2 gap-5">
                         <FormInput label={t(language, "projectName")} required value={projectForm.name} onChange={e => setProjectForm(c => ({ ...c, name: e.target.value }))} />
                         <NumberFormatInput label={t(language, "budget")} required value={projectForm.budget} onChangeRaw={val => setProjectForm(c => ({ ...c, budget: val }))} />
@@ -857,9 +875,7 @@ export function DashboardPage({
                       </FormSelect>
                     )}
 
-                    {userForm.role === "VENDOR" && (
-                      <FormInput label="Wallet Address" value={userForm.walletAddress || ""} onChange={e => setUserForm(c => ({ ...c, walletAddress: e.target.value }))} placeholder="0x..." required />
-                    )}
+                    <FormInput label="Wallet Address" value={userForm.walletAddress || ""} onChange={e => setUserForm(c => ({ ...c, walletAddress: e.target.value }))} placeholder="0x..." required />
 
                     <FormInput label={t(language, "password")} type="password" value={userForm.password} onChange={e => setUserForm(c => ({ ...c, password: e.target.value }))} required />
                     <button type="submit" className="rounded-xl bg-[#0F172A] px-5 py-3 text-sm font-bold text-white w-full">{t(language, "createUserByAdmin")}</button>
