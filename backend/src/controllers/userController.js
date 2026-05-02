@@ -39,9 +39,8 @@ export async function createUserByAdmin(request, response) {
     if (!["DEPARTMENT", "OFFICER", "CONTRACTOR", "VENDOR"].includes(role)) {
       return response.status(403).json({ error: "District Admin can only create Department, Officer, Contractor, or Vendor roles." });
     }
-    if (request.body.district !== request.user.district) {
-      return response.status(403).json({ error: "You can only create users for your own district." });
-    }
+    // Auto-fill so the user is linked to the creating district
+    request.body.district = request.user.district;
   } else if (creatorRole === "DEPARTMENT") {
     if (!["OFFICER", "CONTRACTOR", "VENDOR"].includes(role)) {
       return response.status(403).json({ error: "Department Head can only create Officer, Contractor, or Vendor roles." });
