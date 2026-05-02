@@ -352,8 +352,8 @@ export function DashboardPage({
     if (["ADMIN", "DISTRICT", "DEPARTMENT"].includes(user.role)) {
       base.push({ key: "fund-management", label: "Fund Management", icon: Shield });
     }
-    // People: Admin and District can create users
-    if (user.role === "ADMIN" || user.role === "DISTRICT") {
+    // People: Finance Minister (ADMIN) creates District & Department, Department creates Vendor
+    if (user.role === "ADMIN" || user.role === "DEPARTMENT") {
       base.push({ key: "people", label: t(language, "people"), icon: Users });
     }
     return base;
@@ -805,7 +805,7 @@ export function DashboardPage({
             </div>
           ) : null}
 
-          {tab === "people" && (user.role === "ADMIN" || user.role === "DISTRICT") ? (
+          {tab === "people" && (user.role === "ADMIN" || user.role === "DEPARTMENT") ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h2 className="text-2xl font-bold text-slate-900 mb-2">{t(language, "people")}</h2>
               <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
@@ -832,19 +832,23 @@ export function DashboardPage({
                     <FormInput label={t(language, "email")} type="email" value={userForm.email} onChange={e => setUserForm(c => ({ ...c, email: e.target.value }))} required />
 
                     <FormSelect label={t(language, "role")} value={userForm.role} onChange={e => setUserForm(c => ({ ...c, role: e.target.value, departmentName: "", district: "" }))}>
-                      {user.role === "ADMIN" && <option value="DISTRICT">District Officer (Jila Adhikari)</option>}
-                      {(user.role === "ADMIN" || user.role === "DISTRICT") && <option value="DEPARTMENT">Field Department (Executing Body)</option>}
-                      {user.role === "DISTRICT" && <option value="VENDOR">Vendor / Contractor (Thekedar)</option>}
+                      {user.role === "ADMIN" && (
+                        <>
+                          <option value="DISTRICT">District Account</option>
+                          <option value="DEPARTMENT">Department Account</option>
+                        </>
+                      )}
+                      {user.role === "DEPARTMENT" && <option value="VENDOR">Vendor / Contractor</option>}
                     </FormSelect>
 
                     {(userForm.role === "DEPARTMENT" || userForm.role === "DISTRICT") && (
-                      <FormInput label="Department Name" value={userForm.departmentName} onChange={e => setUserForm(c => ({ ...c, departmentName: e.target.value }))} placeholder="E.g. Road Construction" required />
+                      <FormInput label="Department/Office Name" value={userForm.departmentName} onChange={e => setUserForm(c => ({ ...c, departmentName: e.target.value }))} placeholder="E.g. Education Department or Saran DEO" required />
                     )}
 
-                    {userForm.role === "DISTRICT" && (
+                    {(userForm.role === "DISTRICT" || userForm.role === "DEPARTMENT") && (
                       <FormSelect label={t(language, "district")} value={userForm.district} onChange={e => setUserForm(c => ({ ...c, district: e.target.value }))} required>
                         <option value="">Select district</option>
-                        {referenceData.districts.map(i => <option key={i} value={i}>{i}</option>)}
+                        {referenceData?.districts?.map(i => <option key={i} value={i}>{i}</option>)}
                       </FormSelect>
                     )}
 
