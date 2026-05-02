@@ -325,6 +325,8 @@ export function DashboardPage({
   });
   const [userCreated, setUserCreated] = useState(false);
   const [projectCreated, setProjectCreated] = useState(false);
+  const [allocationCreated, setAllocationCreated] = useState(false);
+  const [transferCreated, setTransferCreated] = useState(false);
   const [userSearch, setUserSearch] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState("ALL");
   const transactions = overview.transactions || [];
@@ -722,8 +724,24 @@ export function DashboardPage({
 
 
                 {user.role === "ADMIN" && (
-                  <SectionCard title={t(language, "allocateFunds")} subtitle="Release budget from State to Department">
-                    <form className="grid gap-5" onSubmit={(e) => { e.preventDefault(); onAllocateFunds(allocationForm.projectId, allocationForm); }}>
+                  <SectionCard title={t(language, "allocateFunds")} subtitle="Release budget from State to District/Department">
+                    {allocationCreated && (
+                      <div className="mb-4 rounded-xl bg-emerald-50 p-4 border border-emerald-100 flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <ClipboardCheck size={18} />
+                        </div>
+                        <p className="text-sm font-semibold text-emerald-800">Funds allocated successfully!</p>
+                      </div>
+                    )}
+                    <form className="grid gap-5" onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await onAllocateFunds(allocationForm.projectId, allocationForm);
+                        setAllocationCreated(true);
+                        setTimeout(() => setAllocationCreated(false), 5000);
+                        setAllocationForm({ projectId: "", amount: "", receiverName: "", receiverWallet: "", note: "" });
+                      } catch (err) {}
+                    }}>
                       <FormSelect label={t(language, "projects")} required value={allocationForm.projectId} onChange={e => setAllocationForm(c => ({ ...c, projectId: e.target.value }))}>
                         <option value="">Select project</option>
                         {projects.map(p => <option key={p._id} value={p._id}>{p.name} ({p.department})</option>)}
@@ -733,8 +751,8 @@ export function DashboardPage({
 
                       <FormSelect label="Receiver (Auto-filtered)" required value={allocationForm.receiverName} onChange={handleAllocationReceiverChange}>
                         <option value="">Select receiver</option>
-                        {users.filter(u => u.role === "DEPARTMENT").map(u => (
-                          <option key={u._id} value={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName} - {u.district}</option>
+                        {users.filter(u => u.role === "DISTRICT" || u.role === "DEPARTMENT").map(u => (
+                          <option key={u._id} value={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName} - {u.district || "State"}</option>
                         ))}
                       </FormSelect>
 
@@ -749,8 +767,24 @@ export function DashboardPage({
                 )}
 
                 {(user.role === "DEPARTMENT" || user.role === "DISTRICT") && (
-                  <SectionCard title={t(language, "transferFunds")} subtitle={user.role === "DEPARTMENT" ? "Transfer to District" : "Transfer to Vendor/Project"}>
-                    <form className="grid gap-5" onSubmit={(e) => { e.preventDefault(); onTransferFunds(transferForm.projectId, transferForm); }}>
+                  <SectionCard title={t(language, "transferFunds")} subtitle={user.role === "DISTRICT" ? "Transfer to Department" : "Transfer to Vendor/Contractor"}>
+                    {transferCreated && (
+                      <div className="mb-4 rounded-xl bg-emerald-50 p-4 border border-emerald-100 flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                          <ClipboardCheck size={18} />
+                        </div>
+                        <p className="text-sm font-semibold text-emerald-800">Funds transferred successfully!</p>
+                      </div>
+                    )}
+                    <form className="grid gap-5" onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await onTransferFunds(transferForm.projectId, transferForm);
+                        setTransferCreated(true);
+                        setTimeout(() => setTransferCreated(false), 5000);
+                        setTransferForm({ projectId: "", receiverName: "", receiverWallet: "", receiverRole: "", amount: "", note: "" });
+                      } catch (err) {}
+                    }}>
                       <FormSelect label={t(language, "projects")} required value={transferForm.projectId} onChange={e => setTransferForm(c => ({ ...c, projectId: e.target.value }))}>
                         <option value="">Select project</option>
                         {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
@@ -759,7 +793,7 @@ export function DashboardPage({
                       <div className="grid grid-cols-2 gap-5">
                         <FormSelect label="Receiver" required value={transferForm.receiverName} onChange={handleTransferReceiverChange}>
                           <option value="">Select receiver</option>
-                          {users.filter(u => user.role === "DEPARTMENT" ? u.role === "DISTRICT" : (u.role === "VENDOR" || u.role === "CONTRACTOR" || u.role === "OFFICER")).map(u => (
+                          {users.filter(u => user.role === "DISTRICT" ? u.role === "DEPARTMENT" : u.role === "VENDOR").map(u => (
                             <option key={u._id} value={`${u.firstName} ${u.lastName}`}>{u.firstName} {u.lastName}</option>
                           ))}
                         </FormSelect>
