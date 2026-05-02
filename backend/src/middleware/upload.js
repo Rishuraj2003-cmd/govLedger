@@ -1,22 +1,23 @@
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
-import { join, extname } from "node:path";
-import { existsSync, mkdirSync } from "node:fs";
-import { randomUUID } from "node:crypto";
 
-const UPLOAD_DIR = join(process.cwd(), "uploads");
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
-// Ensure uploads directory exists
-if (!existsSync(UPLOAD_DIR)) {
-  mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination(_req, _file, cb) {
-    cb(null, UPLOAD_DIR);
-  },
-  filename(_req, file, cb) {
-    const ext = extname(file.originalname).toLowerCase();
-    cb(null, `${randomUUID()}${ext}`);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "govledger_uploads",
+    resource_type: "auto", // Automatically detect image, video, or raw (PDF/Doc)
+    public_id: (req, file) => {
+      const originalName = file.originalname.split(".")[0];
+      return `${Date.now()}-${originalName}`;
+    },
   },
 });
 
@@ -46,12 +47,12 @@ export const upload = multer({
 });
 
 /** Convert a multer file object to a plain attachment record */
-export function fileToAttachment(file, baseUrl) {
+export function fileToAttachment(file, _baseUrl) {
   return {
     originalName: file.originalname,
-    filename: file.filename,
+    filename: file.filename || file.public_id,
     mimetype: file.mimetype,
     size: file.size,
-    url: `${baseUrl}/uploads/${file.filename}`,
+    url: file.path, // Cloudinary returns the full URL in 'path'
   };
 }
