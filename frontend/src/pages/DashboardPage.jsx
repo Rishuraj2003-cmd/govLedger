@@ -744,7 +744,7 @@ export function DashboardPage({
                     }}>
                       <FormSelect label={t(language, "projects")} required value={allocationForm.projectId} onChange={e => setAllocationForm(c => ({ ...c, projectId: e.target.value }))}>
                         <option value="">Select project</option>
-                        {projects.map(p => <option key={p._id} value={p._id}>{p.name} ({p.department})</option>)}
+                        {projects.map(p => <option key={p._id} value={p._id}>{p.name} (Available: ₹{p.budget - p.allocatedFunds} / ₹{p.budget})</option>)}
                       </FormSelect>
 
                       <NumberFormatInput label={t(language, "amount")} required value={allocationForm.amount} onChangeRaw={val => setAllocationForm(c => ({ ...c, amount: val }))} />
@@ -787,7 +787,7 @@ export function DashboardPage({
                     }}>
                       <FormSelect label={t(language, "projects")} required value={transferForm.projectId} onChange={e => setTransferForm(c => ({ ...c, projectId: e.target.value }))}>
                         <option value="">Select project</option>
-                        {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                        {projects.map(p => <option key={p._id} value={p._id}>{p.name} (Available: ₹{p.allocatedFunds} to transfer)</option>)}
                       </FormSelect>
 
                       <div className="grid grid-cols-2 gap-5">
